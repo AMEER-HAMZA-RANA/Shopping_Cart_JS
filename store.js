@@ -1,6 +1,6 @@
 import items from '/items.json'
-import setupCart from "./cart"
-import currencyFormatter from './.util/currencyFormatter';
+import setupCart from "./cart.js"
+import currencyFormatter from './.util/currencyFormatter.js';
 
 const storeItemTemp = document.querySelector('#store-item-temp')
 const container = document.querySelector('[data-container]')

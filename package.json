@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "parcel index.html store.html team.html",
     "build": "parcel build index.html store.html team.html"

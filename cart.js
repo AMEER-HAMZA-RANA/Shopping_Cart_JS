@@ -1,5 +1,5 @@
 import items from './items.json'
-import currencyFormatter from './.util/currencyFormatter'
+import currencyFormatter from './.util/currencyFormatter.js'
 
 const cartItemsContainer = document.querySelector('[data-cart-items-container]')
 const cartItemTemp = document.querySelector('#cart-item-temp')
