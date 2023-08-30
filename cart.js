@@ -1,104 +1,116 @@
-import items from './items.json'
-import currencyFormatter from './.util/currencyFormatter.js'
+import items from "./items.json" assert { type: "json" };
+import currencyFormatter from "./.util/currencyFormatter.js";
 
-const cartItemsContainer = document.querySelector('[data-cart-items-container]')
-const cartItemTemp = document.querySelector('#cart-item-temp')
-const totalPrice = document.querySelector('[data-total-price]')
-const totalProductsInCart = document.querySelector('[data-total-products-in-cart]')
+const cartItemsContainer = document.querySelector(
+  "[data-cart-items-container]"
+);
+const cart = document.querySelector("[data-cart]");
+const cartItemTemp = document.querySelector("#cart-item-temp");
+const totalPrice = document.querySelector("[data-total-price]");
+const totalProductsInCart = document.querySelector(
+  "[data-total-products-in-cart]"
+);
 
-const IMAGE_URL = 'https://dummyimage.com/210x130'
+const IMAGE_URL = "https://dummyimage.com/210x130";
 
-export default function setupCart(id) {
-    renderCartItem(id)
+let localCart = localStorage.getItem('SHOPPING-CART')
+let shoppingCart = JSON.parse(localCart) || [];
+console.log(shoppingCart)
+renderCartItems()
+
+
+export default function setupCart({ id, price, quantity }) {
+  const existingItem = shoppingCart.find((item) => item.id === id);
+  if (existingItem) {
+    existingItem.quantity++;
+    renderCartItems();
+  } else {
+    //   console.log(id, price, quantity);
+    console.log(shoppingCart);
+    shoppingCart.push({ id, price, quantity });
+    renderCartItems();
+    console.log(shoppingCart);
+  }
 }
 
-let cartItemsArr = []
-let pricesArr = []
+function renderCartItems() {
+    console.log('IMAGE_URL',IMAGE_URL)
+    localStorage.setItem('SHOPPING-CART',JSON.stringify(shoppingCart))
+    setCartLength();
+    calculateTotal();
+    shoppingCart.length === 0 && hideCart()
+    cartItemsContainer.innerHTML = "";
+    shoppingCart.forEach((entry) => {
+    const cartItemTemplate = cartItemTemp.content.cloneNode(true);
+    const cartItem = cartItemTemplate.querySelector("[data-cart-item]");
+    const myItem = items.find((item) => item.id == entry.id);
 
-function renderCartItem({id, price}) {
-    const cartItemClone = cartItemTemp.content.cloneNode(true)
-    const cartItem = cartItemClone.querySelector('[data-cart-item]')
-    const quantityElement = cartItem.querySelector('[data-product-quantity]')
+    const image = cartItem.querySelector("[data-product-image]");
+    image.src = `${IMAGE_URL}/${myItem.imageColor}/${myItem.imageColor}`;
+    console.log('image',image)
 
-    let changingItem = cartItemsArr.find(item => item.id === id)
-    if(Boolean(changingItem)) {
+    const name = cartItem.querySelector("[data-product-name]");
+    name.innerText = myItem.name;
 
-        pricesArr.push({id:changingItem.id, price:price})
+    cartItem.dataset.id = myItem.id;
 
-         changingItem = {id:changingItem.id, quantity:++changingItem.quantity}
-
-        const myItem = cartItemsContainer.querySelector(`[data-id='${changingItem.id}']`)
-
-        const myItemQuantity = myItem.querySelector('[data-product-quantity]')
-        myItemQuantity.innerText = `x${changingItem.quantity}` 
-
-        calculateTotal()
-        setCartLength()
-
-    } else {
-        cartItemsArr.push({id,quantity:1, price:price})
-        pricesArr.push({id, price:price})
-
-    
-    
-    
-        const item = items.find(item => item.id === id)
-    
-        cartItem.dataset.id = item.id
-    
-        const image = cartItem.querySelector('[data-product-image]')
-        image.src = `${IMAGE_URL}/${item.imageColor}/${item.imageColor}`
-        
-        const quantity = cartItemsArr.find(item => item.id === id).quantity
-         quantityElement.innerText = quantity && `x${quantity}`
-
-    
-        const name = cartItem.querySelector('[data-product-name]')
-        name.innerText = item.name
-    
-        const productPrice = cartItem.querySelector('[data-product-price]')
-        productPrice.innerText = currencyFormatter(item.priceCents / 100)
-    
-
-        cartItemsContainer.appendChild(cartItem)
-
-        calculateTotal()
-        setCartLength()
-        cartItemsArr.length === 1 && cart.classList.remove('invisible')
+    if (entry.quantity > 1) {
+      const quantityText = cartItem.querySelector("[data-product-quantity]");
+      quantityText.innerText = `x${entry.quantity}`;
     }
+
+    const price = cartItem.querySelector("[data-product-price]");
+    price.innerText = currencyFormatter(myItem.priceCents / 100);
+
+    cartItemsContainer.appendChild(cartItem);
+    console.log(cartItem);
+    console.log("entry", entry);
+
+    // setCartLength();
+    // calculateTotal();
+    console.log('set length and total')
+
+    shoppingCart.length == 1 && showCart();
+  });
 }
 
-document.addEventListener('click', e => {
-    if(e.target.matches('[data-remove-from-cart-button]')) {
-        const id = parseInt(e.target.closest('[data-cart-item]').dataset.id)
-        removeItemFromCart(id)
-    }
-})
+const cartButton = document.querySelector("[data-cart-btn]");
 
-export function removeItemFromCart(id) {
-const itemToRemove = cartItemsContainer.querySelector(`[data-id='${id}']`)
-itemToRemove.remove()
- pricesArr = pricesArr.filter(item => item.id !== id)
-cartItemsArr = cartItemsArr.filter(item => item.id !== id)
-calculateTotal()
-setCartLength()
-}
-
-const cartButton = document.querySelector('[data-cart-btn]')
-const cart = document.querySelector('[data-cart]')
-
-
-cartButton.addEventListener('click', () => {
-    cart.classList.toggle('invisible')
-})
+cartButton.addEventListener("click", () => {
+  cart.classList.toggle("invisible");
+});
 
 function calculateTotal() {
-    const finalPrice = pricesArr.length && pricesArr.map(a => a.price).reduce((a,b) => a+b)
-    totalPrice.innerText = currencyFormatter(finalPrice)
+  const finalPrice =
+    shoppingCart.length &&
+    shoppingCart.reduce((sum, entry) => {
+      const price = entry.price;
+      const quantity = entry.quantity;
+      return (sum += price * quantity);
+    }, 0);
+  totalPrice.innerText = currencyFormatter(finalPrice);
 }
 
 function setCartLength() {
-    const cartlength = pricesArr.length
-    totalProductsInCart.innerText = cartlength
-    cartlength === 0 && cart.classList.toggle('invisible')
+  totalProductsInCart.innerText = shoppingCart.length;
+}
+
+function showCart() {
+  cart.classList.remove("invisible");
+}
+
+function hideCart() {
+   cart.classList.add("invisible");
+}
+
+document.addEventListener('click', (e) => {
+    if(e.target.matches('[data-remove-from-cart-button]')) {
+        const id = parseInt(e.target.closest('[data-cart-item]').dataset.id)
+        removeItem(id)
+        renderCartItems()
+    }
+})
+
+function removeItem(id) {
+    shoppingCart = shoppingCart.filter(item => item.id !== id)
 }
