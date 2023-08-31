@@ -24,10 +24,10 @@ export default function setupStore() {
 }
 
 function renderStoreItem(item) {
-  if(!storeItemTemp) return
+  if (!storeItemTemp) return;
   const storeItemClone = storeItemTemp.content.cloneNode(true);
   const storeItem = storeItemClone.querySelector("[data-item]");
-    storeItem.dataset.id = storeItem && item.id;
+  storeItem.dataset.id = storeItem && item.id;
 
   const image = storeItem.querySelector("[data-image]");
   image.src = `${IMAGE_URL}/${item.imageColor}/${item.imageColor}`;

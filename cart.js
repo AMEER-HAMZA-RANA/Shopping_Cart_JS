@@ -13,11 +13,10 @@ const totalProductsInCart = document.querySelector(
 
 const IMAGE_URL = "https://dummyimage.com/210x130";
 
-let localCart = localStorage.getItem('SHOPPING-CART')
+let localCart = sessionStorage.getItem("SHOPPING-CART");
 let shoppingCart = JSON.parse(localCart) || [];
-console.log(shoppingCart)
-renderCartItems()
-
+console.log(shoppingCart);
+renderCartItems();
 
 export default function setupCart({ id, price, quantity }) {
   const existingItem = shoppingCart.find((item) => item.id === id);
@@ -34,20 +33,20 @@ export default function setupCart({ id, price, quantity }) {
 }
 
 function renderCartItems() {
-    console.log('IMAGE_URL',IMAGE_URL)
-    localStorage.setItem('SHOPPING-CART',JSON.stringify(shoppingCart))
-    setCartLength();
-    calculateTotal();
-    shoppingCart.length === 0 && hideCart()
-    cartItemsContainer.innerHTML = "";
-    shoppingCart.forEach((entry) => {
+  console.log("IMAGE_URL", IMAGE_URL);
+  sessionStorage.setItem("SHOPPING-CART", JSON.stringify(shoppingCart));
+  setCartLength();
+  calculateTotal();
+  shoppingCart.length === 0 && hideCart();
+  cartItemsContainer.innerHTML = "";
+  shoppingCart.forEach((entry) => {
     const cartItemTemplate = cartItemTemp.content.cloneNode(true);
     const cartItem = cartItemTemplate.querySelector("[data-cart-item]");
     const myItem = items.find((item) => item.id == entry.id);
 
     const image = cartItem.querySelector("[data-product-image]");
     image.src = `${IMAGE_URL}/${myItem.imageColor}/${myItem.imageColor}`;
-    console.log('image',image)
+    console.log("image", image);
 
     const name = cartItem.querySelector("[data-product-name]");
     name.innerText = myItem.name;
@@ -68,7 +67,7 @@ function renderCartItems() {
 
     // setCartLength();
     // calculateTotal();
-    console.log('set length and total')
+    console.log("set length and total");
 
     shoppingCart.length == 1 && showCart();
   });
@@ -100,17 +99,17 @@ function showCart() {
 }
 
 function hideCart() {
-   cart.classList.add("invisible");
+  cart.classList.add("invisible");
 }
 
-document.addEventListener('click', (e) => {
-    if(e.target.matches('[data-remove-from-cart-button]')) {
-        const id = parseInt(e.target.closest('[data-cart-item]').dataset.id)
-        removeItem(id)
-        renderCartItems()
-    }
-})
+document.addEventListener("click", (e) => {
+  if (e.target.matches("[data-remove-from-cart-button]")) {
+    const id = parseInt(e.target.closest("[data-cart-item]").dataset.id);
+    removeItem(id);
+    renderCartItems();
+  }
+});
 
 function removeItem(id) {
-    shoppingCart = shoppingCart.filter(item => item.id !== id)
+  shoppingCart = shoppingCart.filter((item) => item.id !== id);
 }
