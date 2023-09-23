@@ -15,7 +15,6 @@ const IMAGE_URL = "https://dummyimage.com/210x130";
 
 let localCart = sessionStorage.getItem("SHOPPING-CART");
 let shoppingCart = JSON.parse(localCart) || [];
-console.log(shoppingCart);
 renderCartItems();
 
 export default function setupCart({ id, price, quantity }) {
@@ -24,16 +23,12 @@ export default function setupCart({ id, price, quantity }) {
     existingItem.quantity++;
     renderCartItems();
   } else {
-    //   console.log(id, price, quantity);
-    console.log(shoppingCart);
     shoppingCart.push({ id, price, quantity });
     renderCartItems();
-    console.log(shoppingCart);
   }
 }
 
 function renderCartItems() {
-  console.log("IMAGE_URL", IMAGE_URL);
   sessionStorage.setItem("SHOPPING-CART", JSON.stringify(shoppingCart));
   setCartLength();
   calculateTotal();
@@ -46,7 +41,6 @@ function renderCartItems() {
 
     const image = cartItem.querySelector("[data-product-image]");
     image.src = `${IMAGE_URL}/${myItem.imageColor}/${myItem.imageColor}`;
-    console.log("image", image);
 
     const name = cartItem.querySelector("[data-product-name]");
     name.innerText = myItem.name;
@@ -62,12 +56,6 @@ function renderCartItems() {
     price.innerText = currencyFormatter(myItem.priceCents / 100);
 
     cartItemsContainer.appendChild(cartItem);
-    console.log(cartItem);
-    console.log("entry", entry);
-
-    // setCartLength();
-    // calculateTotal();
-    console.log("set length and total");
 
     shoppingCart.length == 1 && showCart();
   });
